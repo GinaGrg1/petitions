@@ -75,9 +75,9 @@ def write_out_csv(df: DataFrame, cols_list: list, output_path: str) -> None:
 
 if __name__ == "__main__":
   
-  df = read_in_json("../data/input/input_data.json)
+  df = read_in_json("../input/input_data.json)
   columns_list = get_top_20_columns(df)
 
-  write_out_csv(df, columns_list, "../data/output/output_data.csv")
+  write_out_csv(df, columns_list, "../output/output_data.csv")
 
 
