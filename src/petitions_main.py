@@ -5,9 +5,6 @@ from pyspark.sql.window import *
 from pyspark.sql.functions import col, monotonically_increasing_id, lit, regexp_count, lower
 
 
-class FilePathNotFoundError(Exception):
-    pass
-
 def read_in_json(file_path: str, spark_:object=None) -> DataFrame:
     """
     Args:
@@ -20,17 +17,16 @@ def read_in_json(file_path: str, spark_:object=None) -> DataFrame:
         Spark dataframe
     """
     _spark = spark_ if spark_ else spark
-    
-    try:
-        data = _spark.read.option("multiline","true")\
-                    .json(file_path)\
-                        .drop(*['label', 'numberOfSignatures'])\
-                            .withColumn("abstract", col("abstract")["_value"])\
-                                .withColumn("petition_id", monotonically_increasing_id()+1)
-        return data
-    except FilePathNotFoundError:
-        raise f"File does not exist in given file path: {file_path}"
-    
+  
+    data = (
+        _spark
+        .read.option("multiline","true")
+        .json(file_path)
+        .drop(*['label', 'numberOfSignatures'])
+        .withColumn("abstract", col("abstract")["_value"])
+        .withColumn("petition_id", monotonically_increasing_id()+1)
+    )
+    return data
 
 def get_top_20_columns(df: DataFrame) -> list:
     """
@@ -49,11 +45,16 @@ def get_top_20_columns(df: DataFrame) -> list:
             ('children', 975),
             ('public', 834),....]
     """
-    top_20_cols_list = df.select('abstract').rdd.flatMap(lambda line: line.abstract.split(' '))\
-                        .filter(lambda word: re.match(r"^[a-zA-Z]{6,}",word))\
-                            .map(lambda x: (x.lower().replace('\n', ''), 1))\
-                                .reduceByKey(lambda x, y: x+y)\
-                                    .sortBy(lambda counts: counts[1], ascending=False).collect()[0:20]
+    top_20_cols_list = (
+        df
+        .select('abstract')
+        .rdd.flatMap(lambda line: line.abstract.split(' '))
+        .filter(lambda word: re.match(r"^[a-zA-Z]{6,}",word))
+        .map(lambda x: (x.lower().replace('\n', ''), 1))
+        .reduceByKey(lambda x, y: x+y)
+        .sortBy(lambda counts: counts[1], ascending=False)
+        .collect()[0:20]
+        )
 
     return [item[0] for item in top_20_cols_list]
 
