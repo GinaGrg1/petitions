@@ -53,7 +53,7 @@ def get_top_20_columns(df: DataFrame) -> list:
                         .filter(lambda word: re.match(r"^[a-zA-Z]{6,}",word))\
                             .map(lambda x: (x.lower().replace('\n', ''), 1))\
                                 .reduceByKey(lambda x, y: x+y)\
-                                    .sortBy(lambda counts: counts[1], ascending=False).collect()[0:19]
+                                    .sortBy(lambda counts: counts[1], ascending=False).collect()[0:20]
 
     return [item[0] for item in top_20_cols_list]
 
