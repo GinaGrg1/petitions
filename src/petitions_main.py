@@ -11,7 +11,7 @@ def read_in_json(file_path: str, spark: object) -> DataFrame:
         file_path: str
             Full path of the json file.
         spark_: object
-            Optional parameter. This is only because the unit testing code is not using databricks..
+            spark session
 
     Returns:
         Spark dataframe
