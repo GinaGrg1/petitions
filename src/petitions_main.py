@@ -1,11 +1,11 @@
 import re
 
+from pyspark.sql import SparkSession
 from pyspark.sql import DataFrame
-from pyspark.sql.window import *
 from pyspark.sql.functions import col, monotonically_increasing_id, lit, regexp_count, lower
 
 
-def read_in_json(file_path: str, spark_:object=None) -> DataFrame:
+def read_in_json(file_path: str, spark: object) -> DataFrame:
     """
     Args:
         file_path: str
@@ -16,10 +16,9 @@ def read_in_json(file_path: str, spark_:object=None) -> DataFrame:
     Returns:
         Spark dataframe
     """
-    _spark = spark_ if spark_ else spark
   
     data = (
-        _spark
+        spark
         .read.option("multiline","true")
         .json(file_path)
         .drop(*['label', 'numberOfSignatures'])
@@ -79,8 +78,10 @@ def write_out_csv(df: DataFrame, cols_list: list, output_path: str) -> None:
   df.drop("abstract").coalesce(1).write.csv(output_path, header=True)
 
 if __name__ == "__main__":
+
+  spark = SparkSession.builder.appName('petitions').getOrCreate()
   
-  df = read_in_json("../input/input_data.json)
+  df = read_in_json("../input/input_data.json", spark)
   columns_list = get_top_20_columns(df)
 
   write_out_csv(df, columns_list, "../output/output_data.csv")
