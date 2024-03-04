@@ -8,17 +8,21 @@ from pyspark.sql.functions import col, monotonically_increasing_id, lit, regexp_
 class FilePathNotFoundError(Exception):
     pass
 
-def read_in_json(file_path: str) -> DataFrame:
+def read_in_json(file_path: str, spark_:object=None) -> DataFrame:
     """
     Args:
         file_path: str
             Full path of the json file.
+        spark_: object
+            Optional parameter. This is only because the unit testing code is not using databricks..
 
     Returns:
         Spark dataframe
     """
+    _spark = spark_ if spark_ else spark
+    
     try:
-        data = spark.read.option("multiline","true")\
+        data = _spark.read.option("multiline","true")\
                     .json(file_path)\
                         .drop(*['label', 'numberOfSignatures'])\
                             .withColumn("abstract", col("abstract")["_value"])\
