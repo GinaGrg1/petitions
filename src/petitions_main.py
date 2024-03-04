@@ -71,7 +71,7 @@ def write_out_csv(df: DataFrame, cols_list: list, output_path: str) -> None:
   for column in cols_list:
       df = df.withColumn(column, regexp_count(lower('abstract'), lit(r'\b' + column + r'\b')))
   
-  df.coalesce(1).write.csv(output_path, header=True)
+  df.drop("abstract").coalesce(1).write.csv(output_path, header=True)
 
 if __name__ == "__main__":
   
