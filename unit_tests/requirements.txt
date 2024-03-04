@@ -1,0 +1,4 @@
+pytest
+pytest-spark
+pytest-azurepipelines
+pyspark==3.5.0
