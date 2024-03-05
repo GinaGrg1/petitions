@@ -49,7 +49,7 @@ def get_top_20_columns(df: DataFrame) -> list:
         .select('abstract')
         .rdd.flatMap(lambda line: line.abstract.split(' '))
         .filter(lambda word: re.match(r"^[a-zA-Z]{6,}",word))
-        .map(lambda x: (x.lower().replace('\n', ''), 1))
+        .map(lambda x: (re.sub(r"[^A-Za-z]", "",x.lower()), 1))
         .reduceByKey(lambda x, y: x+y)
         .sortBy(lambda counts: counts[1], ascending=False)
         .collect()[0:20]
